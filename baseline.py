@@ -153,7 +153,7 @@ def get_training_data_xception():
         else:
             y_train.append([0,1])
             total_hate += 1
-        img = image.load_img(TRAIN_PATH+filename, target_size=(224, 224))
+        img = image.load_img(TRAIN_PATH+filename, target_size=(299, 299))
         x = image.img_to_array(img)
         x = xception.preprocess_input(x)
         X_train.append(x)
@@ -175,7 +175,7 @@ def get_training_data_xception():
         else:
             y_val.append([0,1])
             total_hate += 1
-        img = image.load_img(VAL_PATH+filename, target_size=(224, 224))
+        img = image.load_img(VAL_PATH+filename, target_size=(299, 299))
         x = image.img_to_array(img)
         x = xception.preprocess_input(x)
         X_val.append(x)
@@ -204,7 +204,7 @@ def get_test_data_xception():
         else:
             y_test.append(1)
             total_hate += 1
-        img = image.load_img(TEST_PATH+filename, target_size=(224, 224))
+        img = image.load_img(TEST_PATH+filename, target_size=(299, 299))
         x = image.img_to_array(img)
         x = xception.preprocess_input(x)
         X_test.append(x)
@@ -249,7 +249,7 @@ def get_training_data_inceptionv3():
         else:
             y_train.append([0,1])
             total_hate += 1
-        img = image.load_img(TRAIN_PATH+filename, target_size=(224, 224))
+        img = image.load_img(TRAIN_PATH+filename, target_size=(299, 299))
         x = image.img_to_array(img)
         x = inceptionv3.preprocess_input(x)
         X_train.append(x)
@@ -271,7 +271,7 @@ def get_training_data_inceptionv3():
         else:
             y_val.append([0,1])
             total_hate += 1
-        img = image.load_img(VAL_PATH+filename, target_size=(224, 224))
+        img = image.load_img(VAL_PATH+filename, target_size=(299, 299))
         x = image.img_to_array(img)
         x = inceptionv3.preprocess_input(x)
         X_val.append(x)
@@ -300,7 +300,7 @@ def get_test_data_inceptionv3():
         else:
             y_test.append(1)
             total_hate += 1
-        img = image.load_img(TEST_PATH+filename, target_size=(224, 224))
+        img = image.load_img(TEST_PATH+filename, target_size=(299, 299))
         x = image.img_to_array(img)
         x = inceptionv3.preprocess_input(x)
         X_test.append(x)
@@ -339,6 +339,7 @@ if __name__ == "__main__":
     sys.stdout.flush()
     model = build_xception_model()
     model.summary()
+    sys.stdout.flush()
     print 'Building data...'
     X_train, y_train, X_val, y_val = get_training_data_xception()
     sys.stdout.flush()
