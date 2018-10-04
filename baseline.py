@@ -10,6 +10,7 @@ import os
 
 #from keras.applications.resnet50 import ResNet50
 import keras.applications.inception_v3 as inceptionv3
+import keras.applications.mobilenet_v2 as mobilenetv2
 import keras.applications.resnet50 as resnet50
 import keras.applications.xception as xception
 from keras.layers import Dense
@@ -311,7 +312,101 @@ def get_test_data_inceptionv3():
     y_test = np.array(y_test)
     return X_test, y_test
 
+'''
+********************************************************
+*******************MOBILENETV2**************************
+********************************************************
+'''
+def build_mobilenetv2_model():
+    # get the model without the denses
+    base_model = mobilenetv2.MobileNetV2(weights='imagenet', include_top='false')
+    new_dense = base_model.output
+    # add the new denses to classify the hate images
+    new_dense = Dense(1024, activation='relu')(new_dense)
+    predictions = Dense(2, activation='softmax')(new_dense)
+    model = Model(inputs=base_model.input, outputs=predictions)
+    # we will only train the new denses for the baseline
+    for layer in base_model.layers:
+        layer.trainable = False
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics = ["accuracy"])
+    return model
 
+def get_training_data_mobilenetv2():    
+    filenames = os.listdir(TRAIN_PATH) 
+    shuffle(filenames)
+    X_train = []
+    y_train = []
+    total_hate = 0
+    total_no_hate = 0
+    print '*****TRAIN*****'
+    for filename in filenames:
+        if "no_hate" in filename:
+            y_train.append([1,0])
+            total_no_hate += 1
+        else:
+            y_train.append([0,1])
+            total_hate += 1
+        img = image.load_img(TRAIN_PATH+filename, target_size=(224, 224))
+        x = image.img_to_array(img)
+        x = mobilenetv2.preprocess_input(x)
+        X_train.append(x)
+    print 'Total train examples: ' + str(len(y_train))
+    print 'No hate examples: ' + str(total_no_hate)
+    print 'Hate examples: ' + str(total_hate)
+        
+    print '*****VAL*****'
+    filenames = os.listdir(VAL_PATH) 
+    shuffle(filenames)
+    X_val = []
+    y_val = []
+    total_hate = 0
+    total_no_hate = 0
+    for filename in filenames:
+        if "no_hate" in filename:
+            y_val.append([1,0])
+            total_no_hate += 1
+        else:
+            y_val.append([0,1])
+            total_hate += 1
+        img = image.load_img(VAL_PATH+filename, target_size=(224, 224))
+        x = image.img_to_array(img)
+        x = mobilenetv2.preprocess_input(x)
+        X_val.append(x)
+    print 'Total val examples: ' + str(len(y_val))
+    print 'No hate examples: ' + str(total_no_hate)
+    print 'Hate examples: ' + str(total_hate)  
+    
+    X_train = np.array(X_train)
+    y_train = np.array(y_train)
+    X_val = np.array(X_val)
+    y_val = np.array(y_val)
+    return X_train, y_train, X_val, y_val
+
+def get_test_data_mobilenetv2(): 
+    print '*****TEST*****'
+    filenames = os.listdir(TEST_PATH) 
+    shuffle(filenames)
+    X_test = []
+    y_test = []
+    total_hate = 0
+    total_no_hate = 0
+    for filename in filenames:
+        if "no_hate" in filename:
+            y_test.append(0)
+            total_no_hate += 1
+        else:
+            y_test.append(1)
+            total_hate += 1
+        img = image.load_img(TEST_PATH+filename, target_size=(224, 224))
+        x = image.img_to_array(img)
+        x = mobilenetv2.preprocess_input(x)
+        X_test.append(x)
+    print 'Total val examples: ' + str(len(y_test))
+    print 'No hate examples: ' + str(total_no_hate)
+    print 'Hate examples: ' + str(total_hate)  
+    X_test = np.array(X_test)
+    y_test = np.array(y_test)
+    return X_test, y_test
 
 
 
